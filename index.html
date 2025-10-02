@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🎨 Link to QR — 51 Creative QR Designs</title>
+  <title>🎨 Link to QR — Creative QR Generator</title>
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -11,7 +11,7 @@
     .glass { backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
     .preset-card { transition: transform 0.3s ease; }
     .preset-card:hover { transform: translateY(-4px) scale(1.02); }
-    select { color: black; } /* dropdown text black */
+    /* select { color: black; }  dropdown removed */
   </style>
   <!-- QR Code Styling library -->
   <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
@@ -22,7 +22,7 @@
     <!-- Header -->
     <header class="text-center text-white">
       <h1 class="text-3xl font-bold mb-2">🎨 Link to QR</h1>
-      <p class="text-gray-300">Preview 50+ creative QR designs (15 orange/black) and download directly.</p>
+      <p class="text-gray-300">Preview 51 creative QR designs and download directly.</p>
     </header>
 
     <!-- Controls -->
@@ -34,15 +34,11 @@
                value="https://www.linkedin.com/">
       </div>
 
+      <!--
       <div>
         <label class="block text-sm text-gray-300 mb-1">Size</label>
         <input id="sizeRange" type="range" min="150" max="600" value="400" class="w-full">
         <div class="text-xs text-gray-400">Selected: <span id="sizeVal">400</span> px</div>
-      </div>
-
-      <div class="flex gap-2">
-        <button id="generateBtn" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-sky-400 font-semibold">Generate All</button>
-        <button id="randomBtn" class="px-4 py-2 rounded-xl border border-gray-600 text-sm">Random</button>
       </div>
 
       <div>
@@ -51,6 +47,12 @@
           <option value="png">PNG</option>
           <option value="jpeg">JPEG</option>
         </select>
+      </div>
+      -->
+
+      <div class="flex gap-2">
+        <button id="generateBtn" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-sky-400 font-semibold">Generate All</button>
+        <button id="randomBtn" class="px-4 py-2 rounded-xl border border-gray-600 text-sm">Random</button>
       </div>
     </div>
 
@@ -67,7 +69,6 @@
 <script>
 // --- QR PRESET DEFINITIONS (51 total, 15 orange/black) ---
 const presets = [
-  // Existing 21
   {id:'classic', name:'Classic', options:{dotsOptions:{color:'#0f172a',type:'square'}, backgroundOptions:{color:'#ffffff'}}},
   {id:'rounded', name:'Rounded', options:{dotsOptions:{color:'#0ea5e9',type:'rounded'}, backgroundOptions:{color:'#ffffff'}}},
   {id:'dots', name:'Dots', options:{dotsOptions:{color:'#f97316',type:'dots'}, backgroundOptions:{color:'#fff7ed'}}},
@@ -89,7 +90,7 @@ const presets = [
   {id:'pinkblue', name:'Pink & Blue', options:{dotsOptions:{color:'#ec4899',type:'rounded'}, backgroundOptions:{color:'#bfdbfe'}}},
   {id:'lime', name:'Lime Pop', options:{dotsOptions:{color:'#84cc16',type:'dots'}, backgroundOptions:{color:'#ecfccb'}}},
   {id:'grape', name:'Grape', options:{dotsOptions:{color:'#9333ea',type:'rounded'}, backgroundOptions:{color:'#faf5ff'}}},
-  // --- 30 new ones (15 orange/black + 15 other creative) ---
+  // 30 new (15 orange/black + 15 others)
   {id:'ob1', name:'Orange Black 1', options:{dotsOptions:{color:'#f97316',type:'square'}, backgroundOptions:{color:'#000000'}}},
   {id:'ob2', name:'Orange Black 2', options:{dotsOptions:{color:'#ff8c00',type:'dots'}, backgroundOptions:{color:'#111111'}}},
   {id:'ob3', name:'Orange Black 3', options:{dotsOptions:{color:'#ffa500',type:'rounded'}, backgroundOptions:{color:'#0f0f0f'}}},
@@ -105,7 +106,6 @@ const presets = [
   {id:'ob13', name:'Orange Black 13', options:{dotsOptions:{color:'#ff7518',type:'square'}, backgroundOptions:{color:'#080808'}}},
   {id:'ob14', name:'Orange Black 14', options:{dotsOptions:{color:'#fb923c',type:'dots'}, backgroundOptions:{color:'#000000'}}},
   {id:'ob15', name:'Orange Black 15', options:{dotsOptions:{color:'#f97316',type:'extra-rounded'}, backgroundOptions:{color:'#111111'}}},
-  // 15 other new creative
   {id:'sky', name:'Sky Blue', options:{dotsOptions:{color:'#0ea5e9',type:'dots'}, backgroundOptions:{color:'#e0f2fe'}}},
   {id:'emerald', name:'Emerald', options:{dotsOptions:{color:'#10b981',type:'rounded'}, backgroundOptions:{color:'#ecfdf5'}}},
   {id:'rose', name:'Rose', options:{dotsOptions:{color:'#f43f5e',type:'dots'}, backgroundOptions:{color:'#fff1f2'}}},
@@ -140,10 +140,10 @@ function makePresetCard(p) {
 }
 for (const p of presets) { container.appendChild(makePresetCard(p)); }
 
-// --- GENERATE ALL PREVIEWS ---
-async function generateAllPreviews(text, size) {
+// --- GENERATE PREVIEWS (100px fixed) ---
+async function generateAllPreviews(text) {
   for (const p of presets) {
-    const options = { width:size, height:size, data:text, margin:4, ...p.options };
+    const options = { width:100, height:100, data:text, margin:4, ...p.options };
     const qr = new QRCodeStyling(options);
     presetInstances[p.id] = qr;
     const previewEl = document.getElementById(`preview-${p.id}`);
@@ -153,24 +153,20 @@ async function generateAllPreviews(text, size) {
 }
 
 // --- INIT ---
-generateAllPreviews(currentData,400);
+generateAllPreviews(currentData);
 
 // --- BUTTON HANDLERS ---
 document.getElementById('generateBtn').addEventListener('click',()=>{
   const url=document.getElementById('inputUrl').value.trim();
-  const size=Number(document.getElementById('sizeRange').value);
   if(!url){ alert('Enter URL'); return; }
   currentData=url;
-  generateAllPreviews(currentData,size);
+  generateAllPreviews(currentData);
 });
 document.getElementById('randomBtn').addEventListener('click',()=>{
   document.getElementById('inputUrl').value='https://www.linkedin.com/in/john-doe-12345/';
 });
-document.getElementById('sizeRange').addEventListener('input',e=>{
-  document.getElementById('sizeVal').innerText=e.target.value;
-});
 
-// --- DOWNLOAD INDIVIDUAL ---
+// --- DOWNLOAD INDIVIDUAL (always PNG, 600px) ---
 function downloadBlob(blob,filename){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -178,14 +174,16 @@ function downloadBlob(blob,filename){
   document.body.appendChild(a); a.click();
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
 }
+
 container.addEventListener('click',async e=>{
   if(e.target.classList.contains('downloadBtn')){
     const id=e.target.dataset.id;
     const qr=presetInstances[id];
     if(!qr){alert('Generate first');return;}
-    const fmt=document.getElementById('format').value;
-    const blob=await qr.getRawData(fmt);
-    downloadBlob(blob,`linkedin-qr-${id}.${fmt}`);
+    // always generate PNG at 600px for download
+    const tempQR = new QRCodeStyling({ width:600, height:600, data:currentData, margin:4, ...presets.find(p=>p.id===id).options });
+    const blob = await tempQR.getRawData('png');
+    downloadBlob(blob,`linkedin-qr-${id}.png`);
   }
 });
 </script>
