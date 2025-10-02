@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎨 Link to QR — 51 Creative QR Designs</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: linear-gradient(135deg,#0f172a 0%, #071024 45%, #001219 100%); }
+    .glass { backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+    .preset-card { transition: transform 0.3s ease; }
+    .preset-card:hover { transform: translateY(-4px) scale(1.02); }
+    select { color: black; } /* dropdown text black */
+  </style>
+  <!-- QR Code Styling library -->
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-10">
+  <div class="w-full max-w-7xl mx-auto space-y-8">
+
+    <!-- Header -->
+    <header class="text-center text-white">
+      <h1 class="text-3xl font-bold mb-2">🎨 Link to QR</h1>
+      <p class="text-gray-300">Preview 50+ creative QR designs (15 orange/black) and download directly.</p>
+    </header>
+
+    <!-- Controls -->
+    <div class="glass p-6 rounded-2xl text-white flex flex-col gap-4">
+      <div>
+        <label class="block text-sm text-gray-300 mb-1">Your LinkedIn URL</label>
+        <input id="inputUrl" type="url" placeholder="https://www.linkedin.com/in/yourname" 
+               class="w-full p-3 rounded-xl bg-transparent border border-gray-700 placeholder-gray-500 text-white outline-none" 
+               value="https://www.linkedin.com/">
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-300 mb-1">Size</label>
+        <input id="sizeRange" type="range" min="150" max="600" value="400" class="w-full">
+        <div class="text-xs text-gray-400">Selected: <span id="sizeVal">400</span> px</div>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="generateBtn" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-sky-400 font-semibold">Generate All</button>
+        <button id="randomBtn" class="px-4 py-2 rounded-xl border border-gray-600 text-sm">Random</button>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-300 mb-1">Download format</label>
+        <select id="format" class="w-full p-3 rounded-xl bg-white border border-gray-700">
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Previews Grid -->
+    <div class="glass p-6 rounded-2xl text-white">
+      <h2 class="text-lg font-semibold mb-4">QR Code Designs</h2>
+      <div id="presetsContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+        <!-- Presets injected by JS -->
+      </div>
+    </div>
+
+  </div>
+
+<script>
+// --- QR PRESET DEFINITIONS (51 total, 15 orange/black) ---
+const presets = [
+  // Existing 21
+  {id:'classic', name:'Classic', options:{dotsOptions:{color:'#0f172a',type:'square'}, backgroundOptions:{color:'#ffffff'}}},
+  {id:'rounded', name:'Rounded', options:{dotsOptions:{color:'#0ea5e9',type:'rounded'}, backgroundOptions:{color:'#ffffff'}}},
+  {id:'dots', name:'Dots', options:{dotsOptions:{color:'#f97316',type:'dots'}, backgroundOptions:{color:'#fff7ed'}}},
+  {id:'dark', name:'Dark Mode', options:{dotsOptions:{color:'#ffffff',type:'square'}, backgroundOptions:{color:'#0f172a'}}},
+  {id:'linkedin', name:'LinkedIn Blue', options:{dotsOptions:{color:'#0a66c2',type:'rounded'}, backgroundOptions:{color:'#e6f0fa'}}},
+  {id:'neon', name:'Neon Glow', options:{dotsOptions:{color:'#00f0ff',type:'dots'}, backgroundOptions:{color:'#001219'}}},
+  {id:'sunset', name:'Sunset', options:{dotsOptions:{color:'#fb923c',type:'rounded'}, backgroundOptions:{color:'#fde68a'}}},
+  {id:'forest', name:'Forest', options:{dotsOptions:{color:'#22c55e',type:'square'}, backgroundOptions:{color:'#ecfdf5'}}},
+  {id:'bubblegum', name:'Bubblegum', options:{dotsOptions:{color:'#ec4899',type:'dots'}, backgroundOptions:{color:'#fdf2f8'}}},
+  {id:'cartoon', name:'Cartoonish', options:{dotsOptions:{color:'#facc15',type:'rounded'}, backgroundOptions:{color:'#fff3c4'}}},
+  {id:'midnight', name:'Midnight', options:{dotsOptions:{color:'#6366f1',type:'extra-rounded'}, backgroundOptions:{color:'#0f172a'}}},
+  {id:'aqua', name:'Aqua Wave', options:{dotsOptions:{color:'#06b6d4',type:'dots'}, backgroundOptions:{color:'#e0f2fe'}}},
+  {id:'fire', name:'Fire Red', options:{dotsOptions:{color:'#ef4444',type:'square'}, backgroundOptions:{color:'#fee2e2'}}},
+  {id:'mint', name:'Minty', options:{dotsOptions:{color:'#10b981',type:'rounded'}, backgroundOptions:{color:'#d1fae5'}}},
+  {id:'lavender', name:'Lavender', options:{dotsOptions:{color:'#a78bfa',type:'dots'}, backgroundOptions:{color:'#f3e8ff'}}},
+  {id:'retro', name:'Retro', options:{dotsOptions:{color:'#f59e0b',type:'rounded'}, backgroundOptions:{color:'#fef3c7'}}},
+  {id:'coolgray', name:'Cool Gray', options:{dotsOptions:{color:'#6b7280',type:'square'}, backgroundOptions:{color:'#f9fafb'}}},
+  {id:'rainbow', name:'Rainbow', options:{dotsOptions:{color:'#ef4444',type:'dots'}, backgroundOptions:{color:'#fff'}}},
+  {id:'pinkblue', name:'Pink & Blue', options:{dotsOptions:{color:'#ec4899',type:'rounded'}, backgroundOptions:{color:'#bfdbfe'}}},
+  {id:'lime', name:'Lime Pop', options:{dotsOptions:{color:'#84cc16',type:'dots'}, backgroundOptions:{color:'#ecfccb'}}},
+  {id:'grape', name:'Grape', options:{dotsOptions:{color:'#9333ea',type:'rounded'}, backgroundOptions:{color:'#faf5ff'}}},
+  // --- 30 new ones (15 orange/black + 15 other creative) ---
+  {id:'ob1', name:'Orange Black 1', options:{dotsOptions:{color:'#f97316',type:'square'}, backgroundOptions:{color:'#000000'}}},
+  {id:'ob2', name:'Orange Black 2', options:{dotsOptions:{color:'#ff8c00',type:'dots'}, backgroundOptions:{color:'#111111'}}},
+  {id:'ob3', name:'Orange Black 3', options:{dotsOptions:{color:'#ffa500',type:'rounded'}, backgroundOptions:{color:'#0f0f0f'}}},
+  {id:'ob4', name:'Orange Black 4', options:{dotsOptions:{color:'#fb923c',type:'extra-rounded'}, backgroundOptions:{color:'#1a1a1a'}}},
+  {id:'ob5', name:'Orange Black 5', options:{dotsOptions:{color:'#f97316',type:'dots'}, backgroundOptions:{color:'#1c1917'}}},
+  {id:'ob6', name:'Orange Black 6', options:{dotsOptions:{color:'#ff7518',type:'square'}, backgroundOptions:{color:'#000000'}}},
+  {id:'ob7', name:'Orange Black 7', options:{dotsOptions:{color:'#f97316',type:'rounded'}, backgroundOptions:{color:'#2d2d2d'}}},
+  {id:'ob8', name:'Orange Black 8', options:{dotsOptions:{color:'#ff6600',type:'dots'}, backgroundOptions:{color:'#101010'}}},
+  {id:'ob9', name:'Orange Black 9', options:{dotsOptions:{color:'#ffa500',type:'extra-rounded'}, backgroundOptions:{color:'#141414'}}},
+  {id:'ob10', name:'Orange Black 10', options:{dotsOptions:{color:'#fb923c',type:'rounded'}, backgroundOptions:{color:'#1e1e1e'}}},
+  {id:'ob11', name:'Orange Black 11', options:{dotsOptions:{color:'#ff8c00',type:'dots'}, backgroundOptions:{color:'#0a0a0a'}}},
+  {id:'ob12', name:'Orange Black 12', options:{dotsOptions:{color:'#f97316',type:'rounded'}, backgroundOptions:{color:'#191919'}}},
+  {id:'ob13', name:'Orange Black 13', options:{dotsOptions:{color:'#ff7518',type:'square'}, backgroundOptions:{color:'#080808'}}},
+  {id:'ob14', name:'Orange Black 14', options:{dotsOptions:{color:'#fb923c',type:'dots'}, backgroundOptions:{color:'#000000'}}},
+  {id:'ob15', name:'Orange Black 15', options:{dotsOptions:{color:'#f97316',type:'extra-rounded'}, backgroundOptions:{color:'#111111'}}},
+  // 15 other new creative
+  {id:'sky', name:'Sky Blue', options:{dotsOptions:{color:'#0ea5e9',type:'dots'}, backgroundOptions:{color:'#e0f2fe'}}},
+  {id:'emerald', name:'Emerald', options:{dotsOptions:{color:'#10b981',type:'rounded'}, backgroundOptions:{color:'#ecfdf5'}}},
+  {id:'rose', name:'Rose', options:{dotsOptions:{color:'#f43f5e',type:'dots'}, backgroundOptions:{color:'#fff1f2'}}},
+  {id:'gold', name:'Gold', options:{dotsOptions:{color:'#facc15',type:'rounded'}, backgroundOptions:{color:'#fef9c3'}}},
+  {id:'silver', name:'Silver', options:{dotsOptions:{color:'#9ca3af',type:'square'}, backgroundOptions:{color:'#f3f4f6'}}},
+  {id:'violet', name:'Violet', options:{dotsOptions:{color:'#8b5cf6',type:'dots'}, backgroundOptions:{color:'#ede9fe'}}},
+  {id:'teal', name:'Teal', options:{dotsOptions:{color:'#14b8a6',type:'rounded'}, backgroundOptions:{color:'#f0fdfa'}}},
+  {id:'brick', name:'Brick Red', options:{dotsOptions:{color:'#b91c1c',type:'square'}, backgroundOptions:{color:'#fee2e2'}}},
+  {id:'choco', name:'Chocolate', options:{dotsOptions:{color:'#7c2d12',type:'dots'}, backgroundOptions:{color:'#fef3c7'}}},
+  {id:'aura', name:'Aura', options:{dotsOptions:{color:'#db2777',type:'rounded'}, backgroundOptions:{color:'#faf5ff'}}},
+  {id:'pastel', name:'Pastel Mix', options:{dotsOptions:{color:'#3b82f6',type:'dots'}, backgroundOptions:{color:'#fef9f9'}}},
+  {id:'ice', name:'Icy Blue', options:{dotsOptions:{color:'#38bdf8',type:'square'}, backgroundOptions:{color:'#e0f2fe'}}},
+  {id:'leaf', name:'Leaf Green', options:{dotsOptions:{color:'#4ade80',type:'rounded'}, backgroundOptions:{color:'#ecfdf5'}}},
+  {id:'plum', name:'Plum', options:{dotsOptions:{color:'#6d28d9',type:'dots'}, backgroundOptions:{color:'#ede9fe'}}},
+  {id:'sand', name:'Sand', options:{dotsOptions:{color:'#d97706',type:'rounded'}, backgroundOptions:{color:'#fef3c7'}}}
+];
+
+const presetInstances = {};
+const container = document.getElementById('presetsContainer');
+let currentData = document.getElementById('inputUrl').value;
+
+// --- CREATE PRESET CARDS ---
+function makePresetCard(p) {
+  const card = document.createElement('div');
+  card.className = 'preset-card glass p-3 rounded-xl flex flex-col items-center gap-2';
+  card.innerHTML = `
+    <div id="preview-${p.id}" class="w-24 h-24 bg-white rounded-lg flex items-center justify-center overflow-hidden"></div>
+    <div class="text-xs text-gray-200 font-medium">${p.name}</div>
+    <button class="downloadBtn w-full py-1 rounded-md bg-indigo-500 text-white text-xs" data-id="${p.id}">Download</button>
+  `;
+  return card;
+}
+for (const p of presets) { container.appendChild(makePresetCard(p)); }
+
+// --- GENERATE ALL PREVIEWS ---
+async function generateAllPreviews(text, size) {
+  for (const p of presets) {
+    const options = { width:size, height:size, data:text, margin:4, ...p.options };
+    const qr = new QRCodeStyling(options);
+    presetInstances[p.id] = qr;
+    const previewEl = document.getElementById(`preview-${p.id}`);
+    previewEl.innerHTML='';
+    qr.append(previewEl);
+  }
+}
+
+// --- INIT ---
+generateAllPreviews(currentData,400);
+
+// --- BUTTON HANDLERS ---
+document.getElementById('generateBtn').addEventListener('click',()=>{
+  const url=document.getElementById('inputUrl').value.trim();
+  const size=Number(document.getElementById('sizeRange').value);
+  if(!url){ alert('Enter URL'); return; }
+  currentData=url;
+  generateAllPreviews(currentData,size);
+});
+document.getElementById('randomBtn').addEventListener('click',()=>{
+  document.getElementById('inputUrl').value='https://www.linkedin.com/in/john-doe-12345/';
+});
+document.getElementById('sizeRange').addEventListener('input',e=>{
+  document.getElementById('sizeVal').innerText=e.target.value;
+});
+
+// --- DOWNLOAD INDIVIDUAL ---
+function downloadBlob(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
+}
+container.addEventListener('click',async e=>{
+  if(e.target.classList.contains('downloadBtn')){
+    const id=e.target.dataset.id;
+    const qr=presetInstances[id];
+    if(!qr){alert('Generate first');return;}
+    const fmt=document.getElementById('format').value;
+    const blob=await qr.getRawData(fmt);
+    downloadBlob(blob,`linkedin-qr-${id}.${fmt}`);
+  }
+});
+</script>
+</body>
+</html>
